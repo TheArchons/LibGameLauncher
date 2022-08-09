@@ -4,7 +4,7 @@
 
 int draw() {
     noecho();
-    printw("Welcome to liblauncher\nPress Ctrl+A to add a program, Ctrl+Q to quit\n");
+    printw("Welcome to winlauncher\nPress Ctrl+A to add a program, Ctrl+Q to quit\n");
     
     // open list.txt
     FILE *list = fopen("list.txt", "r");
