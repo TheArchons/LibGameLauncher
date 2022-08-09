@@ -2,9 +2,35 @@
 #include <stdlib.h>
 #include <string.h>
 #include <algorithm>
+#include <Windows.h>
 
 int currx = 0;
 int curry = 2;
+
+int runProgram() {
+    // get program name and path
+    char name[100];
+    char path[100];
+    FILE *list = fopen("list.txt", "r");
+    // move to correct line
+    for (int i = 0; i < curry - 2; i++) {
+        fgets(name, sizeof(name), list);
+        fgets(path, sizeof(path), list);
+    }
+    // get program name
+    fgets(name, sizeof(name), list);
+    // get program path
+    fgets(path, sizeof(path), list);
+    // close list.txt
+    fclose(list);
+    // remove newline from name and path
+    name[strlen(name) - 1] = '\0';
+    path[strlen(path) - 1] = '\0';
+    // run program
+    ShellExecute(NULL, "open", path, NULL, NULL, SW_SHOW);
+
+    return 0;
+}
 
 // move cursor up
 int up() {
@@ -106,9 +132,15 @@ int main() {
         if (c == 3) {
             up();
         }
+
         // if it is downarrow, move down
         if (c == 2) {
             down();
+        }
+
+        // if it is enter, run program
+        if (c == 10) {
+            runProgram();
         }
 
         c = getch();
