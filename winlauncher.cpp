@@ -237,7 +237,7 @@ int up() {
 
 // move cursor down
 int down() {
-    if (curry < LINES - 2 && canMoveCursor) {
+    if (curry < LINES - 1 && canMoveCursor) {
         curry++;
         move(curry, currx);
     }
