@@ -8,6 +8,7 @@
 
 int currx = 0;
 int curry = 2;
+bool enableTimer = true;
 
 // given path of a process, return if the process is running
 int ProcessRunning(char path[]) {
@@ -90,9 +91,61 @@ int draw() {
 }
 
 int drawTimer() {
+    bool processStates[100];
+    // check if each process in list.txt is running
+    FILE *list = fopen("list.txt", "r");
+    char line[1000];
+    int i = 0;
+    bool isPath = false;
+    // if it is a new path, add to processStates.
+    while (fgets(line, sizeof(line), list)) {
+        if (isPath) {
+            // remove newline
+            line[strlen(line) - 1] = '\0';
+            // if it is running, set processStates[i] to true
+            if (ProcessRunning(line)) {
+                processStates[i] = true;
+            }
+            else {
+                processStates[i] = false;
+            }
+            i++;
+            isPath = false;
+        }
+        else {
+            isPath = true;
+        }
+    }
+    fclose(list);
+
     while (true) {
-        draw();
-        std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+        if (enableTimer == true) {
+            // check if processStates[i] has changed
+            FILE *list = fopen("list.txt", "r");
+            char line[1000];
+            int i = 0;
+            bool isPath = false;
+            while (fgets(line, sizeof(line), list)) {
+                if (isPath) {
+                    // remove newline
+                    line[strlen(line) - 1] = '\0';
+                    if (processStates[i] != ProcessRunning(line)) {
+                        // if it has changed, redraw
+                        draw();
+
+                        // set processStates[i] to new value
+                        processStates[i] = ProcessRunning(line);
+                        break;
+                    }
+                }
+                else {
+                    isPath = true;
+                }
+            }
+            fclose(list);
+
+            std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+        }
     }
 }
 
@@ -183,6 +236,7 @@ int down() {
 }
 
 int addPrgm() {
+    enableTimer = false;
     clear();
     echo();
     printw("Enter program name: \n");
@@ -203,6 +257,7 @@ int addPrgm() {
     fclose(fp);
 
     draw();
+    enableTimer = true;
 
     return 0;
 }
@@ -213,6 +268,7 @@ int main() {
     idlok(stdscr, TRUE);
     keypad(stdscr, TRUE);
     std::thread timer(drawTimer);
+    draw();
     //drawTimer();
     char c = getch();
     while (c != 17) {
