@@ -5,6 +5,7 @@
 #include <Windows.h>
 #include <tlhelp32.h>
 #include <thread>
+#include <fstream>
 
 int currx = 0;
 int curry = 3;
@@ -260,6 +261,18 @@ int addPrgm() {
     noecho();
 
     // add program to list.txt
+    // check if the program exists
+    std::ifstream file(path);
+    if(!file.is_open()) {
+        clear();
+        printw("Program not found.\nPress any key to continue.\n");
+        refresh();
+        getch();
+        enableTimer = true;
+        draw();
+        return 0;
+    }
+
     FILE *fp = fopen("list.txt", "a");
     fprintf(fp, "%s\n%s\n", name, path);
     fclose(fp);
