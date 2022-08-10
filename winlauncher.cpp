@@ -3,9 +3,39 @@
 #include <string.h>
 #include <algorithm>
 #include <Windows.h>
+#include <tlhelp32.h>
+#include <thread>
 
 int currx = 0;
 int curry = 2;
+
+// given path of a process, return if the process is running
+int ProcessRunning(char path[]) {
+    // get last token of path
+    char *token = strrchr(path, '\\');
+    token++;
+
+    // check if process is running
+    HANDLE hProcessSnap;
+    PROCESSENTRY32 pe32;
+    hProcessSnap = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0);
+    if (hProcessSnap == INVALID_HANDLE_VALUE) {
+        return 0;
+    }
+    pe32.dwSize = sizeof(PROCESSENTRY32);
+    if (!Process32First(hProcessSnap, &pe32)) {
+        CloseHandle(hProcessSnap);
+        return 0;
+    }
+    do {
+        if (strcmp(pe32.szExeFile, token) == 0) {
+            CloseHandle(hProcessSnap);
+            return 1;
+        }
+    } while (Process32Next(hProcessSnap, &pe32));
+    CloseHandle(hProcessSnap);
+    return 0;
+}
 
 int draw() {
     noecho();
@@ -23,14 +53,32 @@ int draw() {
     int lines = 0;
     LINES = 1000;
     while (fgets(line, sizeof(line), list)) {
-        if (!isPath) {
+        if (isPath) {
             lines++;
-            printw("%s", line);
-            isPath = true;
+            
+            isPath = false;
+            // if it is running, highlight green
+            // remove newline
+            line[strlen(line) - 1] = '\0';
+            // set colors
+            start_color();
+            init_pair(1, COLOR_WHITE, COLOR_GREEN);
+            init_pair(2, COLOR_WHITE, COLOR_BLACK);
+            if (ProcessRunning(line)) {
+                attron(COLOR_PAIR(1));
+                printw("%s", temp);
+                attroff(COLOR_PAIR(1));
+            }
+            else {
+                attron(COLOR_PAIR(2));
+                printw("%s", temp);
+                attroff(COLOR_PAIR(2));
+            }
             refresh();
         }
         else {
-            isPath = false;
+            strcpy(temp, line);
+            isPath = true;
         }
     }
     currx = 0;
@@ -39,6 +87,13 @@ int draw() {
     LINES = lines + 3;
     refresh();
     return 0;
+}
+
+int drawTimer() {
+    while (true) {
+        draw();
+        std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+    }
 }
 
 // remove program from list.txt at curry
@@ -97,8 +152,14 @@ int runProgram() {
     // remove newline from name and path
     name[strlen(name) - 1] = '\0';
     path[strlen(path) - 1] = '\0';
+    //check if program is running
+    if (ProcessRunning(path)) {
+        return 0;
+    }
     // run program
     ShellExecute(NULL, "open", path, NULL, NULL, SW_SHOW);
+
+    draw();
 
     return 0;
 }
@@ -122,7 +183,6 @@ int down() {
 }
 
 int addPrgm() {
-    // get program name and path
     clear();
     echo();
     printw("Enter program name: \n");
@@ -152,7 +212,8 @@ int main() {
     scrollok(stdscr,TRUE);
     idlok(stdscr, TRUE);
     keypad(stdscr, TRUE);
-    draw();
+    std::thread timer(drawTimer);
+    //drawTimer();
     char c = getch();
     while (c != 17) {
         // if ctrl+a, add program
