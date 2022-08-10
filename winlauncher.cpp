@@ -9,6 +9,7 @@
 int currx = 0;
 int curry = 2;
 bool enableTimer = true;
+bool endThreads = false;
 
 // given path of a process, return if the process is running
 int ProcessRunning(char path[]) {
@@ -119,6 +120,9 @@ int drawTimer() {
     fclose(list);
 
     while (true) {
+        if (endThreads) {
+            return 0;
+        }
         if (enableTimer == true) {
             // check if processStates[i] has changed
             FILE *list = fopen("list.txt", "r");
@@ -301,5 +305,7 @@ int main() {
 
         c = getch();
     }
+    endThreads = true;
+    timer.join();
     return 0;
 }
