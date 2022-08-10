@@ -307,5 +307,7 @@ int main() {
     }
     endThreads = true;
     timer.join();
+
+    endwin();
     return 0;
 }
