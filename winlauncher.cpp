@@ -137,6 +137,8 @@ int drawTimer() {
                         processStates[i] = ProcessRunning(line);
                         break;
                     }
+                    isPath = false;
+                    i++;
                 }
                 else {
                     isPath = true;
