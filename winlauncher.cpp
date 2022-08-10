@@ -53,7 +53,7 @@ int draw() {
     char temp[100];
     char line[1000];
     int lines = 0;
-    LINES = 1000;
+    LINES = 100;
     while (fgets(line, sizeof(line), list)) {
         if (isPath) {
             lines++;
@@ -76,7 +76,6 @@ int draw() {
                 printw("%s", temp);
                 attroff(COLOR_PAIR(2));
             }
-            refresh();
         }
         else {
             strcpy(temp, line);
@@ -195,7 +194,7 @@ int removeProgram() {
 int runProgram() {
     // get program name and path
     char name[100];
-    char path[100];
+    char path[1000];
     FILE *list = fopen("list.txt", "r");
     // move to correct line
     for (int i = 0; i < curry - 2; i++) {
@@ -252,7 +251,7 @@ int addPrgm() {
     clear();
     printw("Enter program path: \n");
     refresh();
-    char path[100];
+    char path[1000];
     getstr(path);
     clear();
     noecho();
@@ -270,7 +269,7 @@ int addPrgm() {
 
 int main() {
     initscr();
-    scrollok(stdscr,TRUE);
+    //scrollok(stdscr,TRUE);
     idlok(stdscr, TRUE);
     keypad(stdscr, TRUE);
     std::thread timer(drawTimer);
