@@ -7,7 +7,7 @@
 #include <thread>
 
 int currx = 0;
-int curry = 2;
+int curry = 3;
 bool enableTimer = true;
 bool endThreads = false;
 bool canMoveCursor = true;
@@ -85,7 +85,7 @@ int draw() {
         }
     }
     currx = 0;
-    curry = 2;
+    curry = 3;
     move(curry, currx);
     LINES = lines + 3;
     refresh();
@@ -166,7 +166,7 @@ int removeProgram() {
     int lines = -1;
     int skipCount = 0;
     while (fgets(line, sizeof(line), list)) {
-        if (lines == ((curry-2)*2)-1) {
+        if (lines == ((curry-3)*2)-1) {
             if (skipCount < 2) {
                 skipCount++;
                 continue;
@@ -200,7 +200,7 @@ int runProgram() {
     char path[1000];
     FILE *list = fopen("list.txt", "r");
     // move to correct line
-    for (int i = 0; i < curry - 2; i++) {
+    for (int i = 0; i < curry - 3; i++) {
         fgets(name, sizeof(name), list);
         fgets(path, sizeof(path), list);
     }
@@ -227,7 +227,7 @@ int runProgram() {
 
 // move cursor up
 int up() {
-    if (curry > 2 && canMoveCursor) {
+    if (curry > 3 && canMoveCursor) {
         curry--;
         move(curry, currx);
     }
