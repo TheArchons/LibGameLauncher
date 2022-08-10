@@ -7,6 +7,77 @@
 int currx = 0;
 int curry = 2;
 
+int draw() {
+    noecho();
+    clear();
+    move(0, 0);
+    printw("winlauncher\nPress Ctrl+A to add a program, Ctrl+Q to quit, Ctrl-R to remove a program\n");
+    
+    // open list.txt
+    FILE *list = fopen("list.txt", "r");
+
+    // read each line
+    bool isPath = false;
+    char temp[100];
+    char line[1000];
+    int lines = 0;
+    LINES = 1000;
+    while (fgets(line, sizeof(line), list)) {
+        if (!isPath) {
+            lines++;
+            printw("%s", line);
+            isPath = true;
+            refresh();
+        }
+        else {
+            isPath = false;
+        }
+    }
+    currx = 0;
+    curry = 2;
+    move(curry, currx);
+    LINES = lines + 3;
+    refresh();
+    return 0;
+}
+
+// remove program from list.txt at curry
+int removeProgram() {
+    // open list.txt
+    FILE *list = fopen("list.txt", "r");
+    FILE *temp = fopen("temp.txt", "w");
+    char line[1000];
+    int lines = -1;
+    int skipCount = 0;
+    while (fgets(line, sizeof(line), list)) {
+        if (lines == ((curry-2)*2)-1) {
+            if (skipCount < 2) {
+                skipCount++;
+                continue;
+            }
+        }
+        fputs(line, temp);
+        lines++;
+    }
+    fclose(list);
+    fclose(temp);
+
+    // write temp.txt to list.txt
+    list = fopen("list.txt", "w");
+    temp = fopen("temp.txt", "r");
+    while (fgets(line, sizeof(line), temp)) {
+        fprintf(list, "%s", line);
+    }
+    fclose(list);
+    fclose(temp);
+
+    // delete temp.txt
+    remove("temp.txt");
+
+    draw();
+    return 0;
+}
+
 int runProgram() {
     // get program name and path
     char name[100];
@@ -50,45 +121,6 @@ int down() {
     return 0;
 }
 
-int draw() {
-    noecho();
-    printw("Welcome to winlauncher\nPress Ctrl+A to add a program, Ctrl+Q to quit\n");
-    
-    // open list.txt
-    FILE *list = fopen("list.txt", "r");
-
-    // read each line
-    bool isPath = false;
-    char temp[100];
-    char line[1000];
-    int lines = 0;
-    LINES = 1000;
-    while (fgets(line, sizeof(line), list)) {
-        if (lines > 19) {
-            break;
-        }
-        // if line is not a path, print it
-        if (!isPath) {
-            lines++;
-            printw("%s", line);
-            isPath = true;
-            refresh();
-        }
-        else {
-            isPath = false;
-        }
-    }
-    if (lines > 19) {
-        printw("...\n");
-    }
-    currx = 0;
-    curry = 2;
-    move(curry, currx);
-    LINES = lines + 3;
-    refresh();
-    return 0;
-}
-
 int addPrgm() {
     // get program name and path
     clear();
@@ -129,7 +161,7 @@ int main() {
         }
 
         // if it is uparrow, move up
-        if (c == 3) {
+         if (c == 3) {
             up();
         }
 
@@ -141,6 +173,11 @@ int main() {
         // if it is enter, run program
         if (c == 10) {
             runProgram();
+        }
+
+        // if it is ctrl+r, remove program
+        if (c == 18) {
+            removeProgram();
         }
 
         c = getch();
