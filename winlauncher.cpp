@@ -10,6 +10,7 @@ int currx = 0;
 int curry = 2;
 bool enableTimer = true;
 bool endThreads = false;
+bool canMoveCursor = true;
 
 // given path of a process, return if the process is running
 int ProcessRunning(char path[]) {
@@ -40,6 +41,7 @@ int ProcessRunning(char path[]) {
 }
 
 int draw() {
+    canMoveCursor = false;
     noecho();
     clear();
     move(0, 0);
@@ -87,6 +89,7 @@ int draw() {
     move(curry, currx);
     LINES = lines + 3;
     refresh();
+    canMoveCursor = true;
     return 0;
 }
 
@@ -224,7 +227,7 @@ int runProgram() {
 
 // move cursor up
 int up() {
-    if (curry > 2) {
+    if (curry > 2 && canMoveCursor) {
         curry--;
         move(curry, currx);
     }
@@ -233,7 +236,7 @@ int up() {
 
 // move cursor down
 int down() {
-    if (curry < LINES - 2) {
+    if (curry < LINES - 2 && canMoveCursor) {
         curry++;
         move(curry, currx);
     }
