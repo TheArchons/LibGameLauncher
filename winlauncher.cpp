@@ -45,7 +45,7 @@ int draw() {
     noecho();
     clear();
     move(0, 0);
-    printw("winlauncher\nPress Ctrl+A to add a program, Ctrl+Q to quit, Ctrl-R to remove a program\n");
+    printw("winlauncher\nPress Ctrl+A to add a program, Ctrl+Q to quit, Ctrl-R to remove a program\n\n");
     
     // open list.txt
     FILE *list = fopen("list.txt", "r");
