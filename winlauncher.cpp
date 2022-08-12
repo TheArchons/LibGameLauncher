@@ -12,6 +12,7 @@ int curry = 3;
 bool enableTimer = true;
 bool endThreads = false;
 bool canMoveCursor = true;
+bool processStates[100];
 
 // given path of a process, return if the process is running
 int ProcessRunning(char path[]) {
@@ -46,7 +47,7 @@ int draw() {
     noecho();
     clear();
     move(0, 0);
-    printw("winlauncher\nPress Ctrl+A to add a program, Ctrl+Q to quit, Ctrl+R to remove a program\n\n");
+    printw("winlauncher\nPress Ctrl+A to add a program, Ctrl+Q to quit, Ctrl+R to remove a program, Enter to start a program, and Ctrl+S to force start a program\n\n");
     
     // open list.txt
     FILE *list = fopen("list.txt", "r");
@@ -95,7 +96,6 @@ int draw() {
 }
 
 int drawTimer() {
-    bool processStates[100];
     // check if each process in list.txt is running
     FILE *list = fopen("list.txt", "r");
     char line[1000];
@@ -195,7 +195,7 @@ int removeProgram() {
     return 0;
 }
 
-int runProgram() {
+int runProgram(bool forceStart=false) {
     // get program name and path
     char name[100];
     char path[1000];
@@ -214,13 +214,15 @@ int runProgram() {
     // remove newline from name and path
     name[strlen(name) - 1] = '\0';
     path[strlen(path) - 1] = '\0';
-    //check if program is running
-    if (ProcessRunning(path)) {
+    //check if program is running if not forceStart
+    if (!forceStart && ProcessRunning(path)) {
         return 0;
     }
     // run program
     ShellExecute(NULL, "open", path, NULL, NULL, SW_SHOW);
 
+    // set processStates[i] to true
+    processStates[curry - 3] = true;
     draw();
 
     return 0;
@@ -316,6 +318,11 @@ int main() {
         // if it is ctrl+r, remove program
         if (c == 18) {
             removeProgram();
+        }
+
+        // if it is ctrl+s, force start program
+        if (c == 19) {
+            runProgram(true);
         }
 
         c = getch();
