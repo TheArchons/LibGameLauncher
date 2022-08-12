@@ -1,5 +1,7 @@
 # winLauncher
-C++ command line program launcher for Windows, designed for games.\
+C++ command line program launcher for Windows, designed for games.
+
+![https://i.imgur.com/SlIOgrY.png](https://i.imgur.com/SlIOgrY.png)
 
 # Installation
 ## From release
