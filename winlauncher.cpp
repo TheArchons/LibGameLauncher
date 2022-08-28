@@ -16,30 +16,38 @@ bool processStates[100];
 
 // given path of a process, return if the process is running
 int ProcessRunning(char path[]) {
-    // get last token of path
-    char *token = strrchr(path, '\\');
-    token++;
+    try {
+        // get last token of path
+        char *token = strrchr(path, '\\');
+        if (token == NULL) { // if no token, return false
+            return 0;
+        }
+        token++;
 
-    // check if process is running
-    HANDLE hProcessSnap;
-    PROCESSENTRY32 pe32;
-    hProcessSnap = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0);
-    if (hProcessSnap == INVALID_HANDLE_VALUE) {
-        return 0;
-    }
-    pe32.dwSize = sizeof(PROCESSENTRY32);
-    if (!Process32First(hProcessSnap, &pe32)) {
+        // check if process is running
+        HANDLE hProcessSnap;
+        PROCESSENTRY32 pe32;
+        hProcessSnap = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0);
+        if (hProcessSnap == INVALID_HANDLE_VALUE) {
+            return 0;
+        }
+        pe32.dwSize = sizeof(PROCESSENTRY32);
+        if (!Process32First(hProcessSnap, &pe32)) {
+            CloseHandle(hProcessSnap);
+            return 0;
+        }
+        do {
+            if (strcmp(pe32.szExeFile, token) == 0) {
+                CloseHandle(hProcessSnap);
+                return 1;
+            }
+        } while (Process32Next(hProcessSnap, &pe32));
         CloseHandle(hProcessSnap);
         return 0;
     }
-    do {
-        if (strcmp(pe32.szExeFile, token) == 0) {
-            CloseHandle(hProcessSnap);
-            return 1;
-        }
-    } while (Process32Next(hProcessSnap, &pe32));
-    CloseHandle(hProcessSnap);
-    return 0;
+    catch (...) {
+        return 0; // error, assume process is not running
+    }
 }
 
 int draw() {
@@ -276,9 +284,16 @@ int addPrgm() {
         return 0;
     }
 
-    FILE *fp = fopen("list.txt", "a");
-    fprintf(fp, "%s\n%s\n", name, path);
-    fclose(fp);
+    try {
+        FILE *fp = fopen("list.txt", "a");
+        fprintf(fp, "%s\n%s\n", name, path);
+        fclose(fp);
+    }
+    catch (...) {
+        clear();
+        printw("Unknown Error. Have you tried running as administrator?\nPress any key to continue.\n");
+        refresh();
+    }
 
     draw();
     enableTimer = true;
