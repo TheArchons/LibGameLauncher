@@ -14,7 +14,7 @@ Simply download the release and run the executable.
 
 ### Build
 1. Clone the repository `git clone https://github.com/TheArchons/WinLauncher`
-2. cd into the directory and run `g++ .\winlauncher.cpp -lpdcurses -o winlauncher.exe`
+2. cd into the directory and run `g++ .\winlauncher.cpp -lpdcurses -o winlauncher.exe -static`
 3. Run `winlauncher.exe`.
 
 # Usage
