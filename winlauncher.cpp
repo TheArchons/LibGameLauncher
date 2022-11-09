@@ -264,23 +264,24 @@ int addPrgm() {
     char name[100];
     getstr(name);
     clear();
-    printw("Enter program path: \n");
-    refresh();
-    char path[1000];
-    getstr(path);
-    clear();
-    noecho();
+    // add program path with windows explorer
+    char path[MAX_PATH] = "";
+    OPENFILENAME ofn;
+    ZeroMemory(&ofn, sizeof(ofn));
 
-    // add program to list.txt
-    // check if the program exists
-    std::ifstream file(path);
-    if(!file.is_open()) {
-        clear();
-        printw("Program not found.\nPress any key to continue.\n");
-        refresh();
-        getch();
-        enableTimer = true;
-        draw();
+    ofn.lStructSize = sizeof(ofn);
+    ofn.hwndOwner = NULL;
+    ofn.lpstrFile = path;
+    ofn.lpstrFile[0] = '\0';
+    ofn.nMaxFile = sizeof(path);
+    ofn.lpstrFilter = "All\0*.*\0Text\0*.TXT\0";
+    ofn.nFilterIndex = 1;
+    ofn.lpstrFileTitle = NULL;
+    ofn.nMaxFileTitle = 0;
+    ofn.lpstrInitialDir = NULL;
+    ofn.Flags = OFN_PATHMUSTEXIST | OFN_FILEMUSTEXIST;
+    
+    if (!GetOpenFileName(&ofn)) {
         return 0;
     }
 
