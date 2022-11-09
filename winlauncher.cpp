@@ -304,42 +304,43 @@ int addPrgm() {
 
 int main() {
     initscr();
-    //scrollok(stdscr,TRUE);
     idlok(stdscr, TRUE);
     keypad(stdscr, TRUE);
     std::thread timer(drawTimer);
     draw();
-    //drawTimer();
+    
     char c = getch();
     while (c != 17) {
-        // if ctrl+a, add program
-        if (c == 1) {
-            addPrgm();
-        }
-
-        // if it is uparrow, move up
-         if (c == 3) {
-            up();
-        }
-
-        // if it is downarrow, move down
-        if (c == 2) {
-            down();
-        }
-
-        // if it is enter, run program
-        if (c == 10) {
-            runProgram();
-        }
-
-        // if it is ctrl+r, remove program
-        if (c == 18) {
-            removeProgram();
-        }
-
-        // if it is ctrl+s, force start program
-        if (c == 19) {
-            runProgram(true);
+        switch (c) {
+            case 1:
+                // ctrl + a
+                addPrgm();
+                break;
+            
+            case 3:
+                // up arrow
+                up();
+                break;
+            
+            case 2:
+                // down arrow
+                down();
+                break;
+            
+            case 10:
+                // enter
+                runProgram();
+                break;
+            
+            case 18:
+                // ctrl + r
+                removeProgram();
+                break;
+            
+            case 19:
+                // ctrl + s
+                runProgram(true);
+                break;
         }
 
         c = getch();
