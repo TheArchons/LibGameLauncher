@@ -279,6 +279,19 @@ void chooseFile(char *outPath) {
     strcpy(outPath, path);
 }
 
+void writeToFile(char *path, char *name) {
+    try {
+        FILE *fp = fopen("list.txt", "a");
+        fprintf(fp, "%s\n%s\n", name, path);
+        fclose(fp);
+    }
+    catch (...) {
+        clear();
+        printw("Unknown Error. Have you tried running as administrator?\nPress any key to continue.\n");
+        refresh();
+    }
+}
+
 int addPrgm() {
     enableTimer = false;
     clear();
@@ -292,16 +305,8 @@ int addPrgm() {
     char path[MAX_PATH];
     chooseFile(path);
 
-    try {
-        FILE *fp = fopen("list.txt", "a");
-        fprintf(fp, "%s\n%s\n", name, path);
-        fclose(fp);
-    }
-    catch (...) {
-        clear();
-        printw("Unknown Error. Have you tried running as administrator?\nPress any key to continue.\n");
-        refresh();
-    }
+    // write to list.txt
+    writeToFile(path, name);
 
     draw();
     enableTimer = true;
