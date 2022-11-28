@@ -255,17 +255,9 @@ int down() {
     return 0;
 }
 
-int addPrgm() {
-    enableTimer = false;
-    clear();
-    echo();
-    printw("Enter program name: \n");
-    refresh();
-    char name[100];
-    getstr(name);
-    clear();
-    // add program path with windows explorer
-    char path[MAX_PATH] = "";
+void chooseFile(char *outPath) {
+    // open file dialog, and update path
+    char path[MAX_PATH];
     OPENFILENAME ofn;
     ZeroMemory(&ofn, sizeof(ofn));
 
@@ -280,10 +272,25 @@ int addPrgm() {
     ofn.nMaxFileTitle = 0;
     ofn.lpstrInitialDir = NULL;
     ofn.Flags = OFN_PATHMUSTEXIST | OFN_FILEMUSTEXIST;
-    
-    if (!GetOpenFileName(&ofn)) {
-        return 0;
-    }
+
+    GetOpenFileName(&ofn);
+
+    // update path
+    strcpy(outPath, path);
+}
+
+int addPrgm() {
+    enableTimer = false;
+    clear();
+    echo();
+    printw("Enter program name: \n");
+    refresh();
+    char name[100];
+    getstr(name);
+    clear();
+    // add program path with windows explorer
+    char path[MAX_PATH];
+    chooseFile(path);
 
     try {
         FILE *fp = fopen("list.txt", "a");
