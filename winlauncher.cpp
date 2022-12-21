@@ -324,8 +324,8 @@ int main() {
     char c = getch();
     while (c != 17) {
         switch (c) {
-            case 1:
-                // ctrl + a
+            case 65:
+                // A
                 addPrgm();
                 break;
             
@@ -344,13 +344,13 @@ int main() {
                 runProgram();
                 break;
             
-            case 18:
-                // ctrl + r
+            case 82:
+                // R
                 removeProgram();
                 break;
             
-            case 19:
-                // ctrl + s
+            case 83:
+                // S
                 runProgram(true);
                 break;
         }
