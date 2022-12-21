@@ -18,4 +18,4 @@ Simply download the release and run the executable.
 3. Run `winlauncher.exe`.
 
 # Usage
-When running the program, use Ctrl+A to add a program, Ctrl+Q to quit, and Ctrl+R to remove a program
+When running the program, use Shift+A to add a program, Shift+Q to quit, and Shift+R to remove a program
