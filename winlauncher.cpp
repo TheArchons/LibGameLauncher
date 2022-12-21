@@ -55,7 +55,7 @@ int draw() {
     noecho();
     clear();
     move(0, 0);
-    printw("winlauncher\nPress Ctrl+A to add a program, Ctrl+Q to quit, Ctrl+R to remove a program, Enter to start a program, and Ctrl+S to force start a program\n\n");
+    printw("winlauncher\nPress Shift+A to add a program, Shift+Q to quit, Shift+R to remove a program, Enter to start a program, and Shift+S to force start a program\n\n");
     
     // open list.txt
     FILE *list = fopen("list.txt", "r");
@@ -322,7 +322,7 @@ int main() {
     draw();
     
     char c = getch();
-    while (c != 17) {
+    while (c != 81) {
         switch (c) {
             case 65:
                 // A
