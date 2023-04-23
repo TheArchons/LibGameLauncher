@@ -14,6 +14,10 @@ bool endThreads = false;
 bool canMoveCursor = true;
 bool processStates[100];
 
+// paths
+const char *listPath = "./list.txt";
+const char *tempPath = "./temp.txt";
+
 // given path of a process, return if the process is running
 int ProcessRunning(char path[]) {
     try {
@@ -58,14 +62,13 @@ int draw() {
     printw("winlauncher\nPress Shift+A to add a program, Shift+Q to quit, Shift+R to remove a program, Enter to start a program, and Shift+S to force start a program\n\n");
     
     // open list.txt
-    FILE *list = fopen("list.txt", "r");
+    FILE *list = fopen(listPath, "r");
 
     // read each line
     bool isPath = false;
     char temp[100];
     char line[1000];
     int lines = 0;
-    LINES = 100;
     while (fgets(line, sizeof(line), list)) {
         if (isPath) {
             lines++;
@@ -100,12 +103,13 @@ int draw() {
     LINES = lines + 3;
     refresh();
     canMoveCursor = true;
+    fclose(list);
     return 0;
 }
 
 int drawTimer() {
     // check if each process in list.txt is running
-    FILE *list = fopen("list.txt", "r");
+    FILE *list = fopen(listPath, "r");
     char line[1000];
     int i = 0;
     bool isPath = false;
@@ -136,7 +140,7 @@ int drawTimer() {
         }
         if (enableTimer == true) {
             // check if processStates[i] has changed
-            FILE *list = fopen("list.txt", "r");
+            FILE *list = fopen(listPath, "r");
             char line[1000];
             int i = 0;
             bool isPath = false;
@@ -170,8 +174,8 @@ int drawTimer() {
 // remove program from list.txt at curry
 int removeProgram() {
     // open list.txt
-    FILE *list = fopen("list.txt", "r");
-    FILE *temp = fopen("temp.txt", "w");
+    FILE *list = fopen(listPath, "r");
+    FILE *temp = fopen(tempPath, "w");
     char line[1000];
     int lines = -1;
     int skipCount = 0;
@@ -189,8 +193,8 @@ int removeProgram() {
     fclose(temp);
 
     // write temp.txt to list.txt
-    list = fopen("list.txt", "w");
-    temp = fopen("temp.txt", "r");
+    list = fopen(listPath, "w");
+    temp = fopen(tempPath, "r");
     while (fgets(line, sizeof(line), temp)) {
         fprintf(list, "%s", line);
     }
@@ -198,7 +202,7 @@ int removeProgram() {
     fclose(temp);
 
     // delete temp.txt
-    remove("temp.txt");
+    remove(tempPath);
 
     draw();
     return 0;
@@ -208,7 +212,7 @@ int runProgram(bool forceStart=false) {
     // get program name and path
     char name[100];
     char path[1000];
-    FILE *list = fopen("list.txt", "r");
+    FILE *list = fopen(listPath, "r");
     // move to correct line
     for (int i = 0; i < curry - 3; i++) {
         fgets(name, sizeof(name), list);
@@ -281,7 +285,7 @@ void chooseFile(char *outPath) {
 
 void writeToFile(char *path, char *name) {
     try {
-        FILE *fp = fopen("list.txt", "a");
+        FILE *fp = fopen(listPath, "a");
         fprintf(fp, "%s\n%s\n", name, path);
         fclose(fp);
     }
