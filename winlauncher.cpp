@@ -11,6 +11,7 @@ int currx = 0;
 int curry = 3;
 int miny = 3;
 int maxy = 3;
+int sleepTime = 10000;
 bool enableTimer = true;
 bool endThreads = false;
 bool canMoveCursor = true;
@@ -142,9 +143,6 @@ int drawTimer() {
     fclose(list);
 
     while (true) {
-        if (endThreads) {
-            return 0;
-        }
         if (enableTimer == true) {
             // check if processStates[i] has changed
             FILE *list = fopen(listPath, "r");
@@ -172,8 +170,13 @@ int drawTimer() {
             }
             fclose(list);
 
-            //change sleep time as needed
-            std::this_thread::sleep_for(std::chrono::milliseconds(10000));
+            // because we need to join this thread to quit, check for endThreads every second, not every sleepTime
+            for (int i = 0; i < sleepTime / 1000; i++) {
+                if (endThreads) {
+                    return 0;
+                }
+                std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+            }
         }
     }
 }
