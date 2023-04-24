@@ -9,6 +9,8 @@
 
 int currx = 0;
 int curry = 3;
+int miny = 3;
+int maxy = 3;
 bool enableTimer = true;
 bool endThreads = false;
 bool canMoveCursor = true;
@@ -97,10 +99,15 @@ int draw() {
             isPath = true;
         }
     }
-    currx = 0;
-    curry = 3;
-    move(curry, currx);
-    LINES = lines + 3;
+
+    // set cursor position to the first program
+    // uses getyx due to line wrapping, so we cannot use move(3, 0)
+    getyx(stdscr, curry, currx);
+    curry -= lines;
+    miny = curry;
+    maxy = curry + lines - 1;
+    move(curry, 0);
+
     refresh();
     canMoveCursor = true;
     fclose(list);
@@ -180,7 +187,7 @@ int removeProgram() {
     int lines = -1;
     int skipCount = 0;
     while (fgets(line, sizeof(line), list)) {
-        if (lines == ((curry-3)*2)-1) {
+        if (lines == ((curry-miny)*2)-1) {
             if (skipCount < 2) {
                 skipCount++;
                 continue;
@@ -214,7 +221,7 @@ int runProgram(bool forceStart=false) {
     char path[1000];
     FILE *list = fopen(listPath, "r");
     // move to correct line
-    for (int i = 0; i < curry - 3; i++) {
+    for (int i = 0; i < curry - miny; i++) {
         fgets(name, sizeof(name), list);
         fgets(path, sizeof(path), list);
     }
@@ -235,7 +242,7 @@ int runProgram(bool forceStart=false) {
     ShellExecute(NULL, "open", path, NULL, NULL, SW_SHOW);
 
     // set processStates[i] to true
-    processStates[curry - 3] = true;
+    processStates[curry - miny] = true;
     draw();
 
     return 0;
@@ -243,7 +250,7 @@ int runProgram(bool forceStart=false) {
 
 // move cursor up
 int up() {
-    if (curry > 3 && canMoveCursor) {
+    if (curry > miny && canMoveCursor) {
         curry--;
         move(curry, currx);
     }
@@ -252,7 +259,7 @@ int up() {
 
 // move cursor down
 int down() {
-    if (curry < LINES - 1 && canMoveCursor) {
+    if (curry < maxy && canMoveCursor) {
         curry++;
         move(curry, currx);
     }
