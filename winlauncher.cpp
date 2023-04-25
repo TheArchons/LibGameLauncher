@@ -335,7 +335,7 @@ int main() {
     std::thread timer(drawTimer);
     draw();
     
-    char c = getch();
+    int c = getch();
     while (c != 81) {
         switch (c) {
             case 65:
@@ -343,12 +343,12 @@ int main() {
                 addPrgm();
                 break;
             
-            case 3:
+            case 259:
                 // up arrow
                 up();
                 break;
             
-            case 2:
+            case 258:
                 // down arrow
                 down();
                 break;
@@ -366,6 +366,10 @@ int main() {
             case 83:
                 // S
                 runProgram(true);
+                break;
+
+            case KEY_RESIZE:
+                draw();
                 break;
         }
 
