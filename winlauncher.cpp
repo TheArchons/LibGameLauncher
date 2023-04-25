@@ -7,6 +7,7 @@
 #include <thread>
 #include <fstream>
 #include <filesystem>
+#include <signal.h>
 
 int currx = 0;
 int curry = 3;
@@ -335,6 +336,20 @@ int addPrgm() {
     return 0;
 }
 
+// redraws when window is resized
+void resize() {
+    endwin();
+    refresh();
+    clear();
+    draw();
+}
+
+// on sigwinch, redraw
+// some terminals don't send KEY_RESIZE, so we need to use sigwinch
+void sigwinch_handler(int sig) {
+    resize();
+}
+
 int main() {
     // Because the open file dialogue changes the current directory, we need to get the current directory at the start
     // get current directory
@@ -346,11 +361,14 @@ int main() {
     strcat(listPath, "\\list.txt");
     strcpy(tempPath, pwd);
     strcat(tempPath, "\\temp.txt");
+    
+    
 
     initscr();
-    idlok(stdscr, TRUE);
+    noecho();
     keypad(stdscr, TRUE);
     std::thread timer(drawTimer);
+    
     draw();
     
     int c = getch();
@@ -385,9 +403,15 @@ int main() {
                 // S
                 runProgram(true);
                 break;
+            
+            case 18:
+                // ctrl + R
+                resize();
+                break;
+            
 
             case KEY_RESIZE:
-                draw();
+                resize();
                 break;
         }
 
