@@ -6,6 +6,7 @@
 #include <tlhelp32.h>
 #include <thread>
 #include <fstream>
+#include <filesystem>
 
 int currx = 0;
 int curry = 3;
@@ -18,8 +19,8 @@ bool canMoveCursor = true;
 bool processStates[100];
 
 // paths
-const char *listPath = "./list.txt";
-const char *tempPath = "./temp.txt";
+char listPath[1000];
+char tempPath[1000];
 
 // given path of a process, return if the process is running
 int ProcessRunning(char path[]) {
@@ -269,7 +270,8 @@ int down() {
     return 0;
 }
 
-void chooseFile(char *outPath) {
+// 0 - success, 1 - error
+int chooseFile(char *outPath) {
     // open file dialog, and update path
     char path[MAX_PATH];
     OPENFILENAME ofn;
@@ -289,8 +291,13 @@ void chooseFile(char *outPath) {
 
     GetOpenFileName(&ofn);
 
-    // update path
+    // update path unless the path is empty (user pressed cancel)
+    if (!strlen(path)) {
+        return 0;
+    }
+
     strcpy(outPath, path);
+    return 1;
 }
 
 void writeToFile(char *path, char *name) {
@@ -317,10 +324,10 @@ int addPrgm() {
     clear();
     // add program path with windows explorer
     char path[MAX_PATH];
-    chooseFile(path);
-
-    // write to list.txt
-    writeToFile(path, name);
+    if (chooseFile(path) == 1) { // returns 1 if success
+        // write to list.txt
+        writeToFile(path, name);
+    }
 
     draw();
     enableTimer = true;
@@ -329,6 +336,17 @@ int addPrgm() {
 }
 
 int main() {
+    // Because the open file dialogue changes the current directory, we need to get the current directory at the start
+    // get current directory
+    char pwd[1000];
+    GetCurrentDirectory(1000, pwd);
+
+    // set listPath to list.txt in current directory
+    strcpy(listPath, pwd);
+    strcat(listPath, "\\list.txt");
+    strcpy(tempPath, pwd);
+    strcat(tempPath, "\\temp.txt");
+
     initscr();
     idlok(stdscr, TRUE);
     keypad(stdscr, TRUE);
