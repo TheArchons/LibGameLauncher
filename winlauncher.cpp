@@ -9,10 +9,7 @@
 #include <filesystem>
 #include <signal.h>
 
-int currx = 0;
-int curry = 3;
-int miny = 3;
-int maxy = 3;
+int currx, curry = 0, miny, maxy;
 int sleepTime = 10000;
 bool enableTimer = true;
 bool endThreads = false;
@@ -102,13 +99,14 @@ int draw() {
             isPath = true;
         }
     }
+    // gets maximum y and x values
+    getyx(stdscr, maxy, currx);
+    maxy--; // because printw adds a newline, max is off by one
+    miny = maxy - lines + 1;
 
-    // set cursor position to the first program
-    // uses getyx due to line wrapping, so we cannot use move(3, 0)
-    getyx(stdscr, curry, currx);
-    curry -= lines;
-    miny = curry;
-    maxy = curry + lines - 1;
+    // if cursor is out of bounds, move it back in bounds
+    curry = std::min(curry, maxy);
+    curry = std::max(curry, miny);
     move(curry, 0);
 
     refresh();
