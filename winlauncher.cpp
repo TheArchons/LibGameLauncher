@@ -181,13 +181,64 @@ int drawTimer() {
     }
 }
 
+bool confirmRemoveProgram(char programName[]) {
+    clear();
+
+    // hide cursor
+    curs_set(0);
+
+    printw("Are you sure you want to remove %s? y/n", programName);
+
+    while (true) {
+        char c = getch();
+        if (c == 'y') {
+            // unhide cursor
+            curs_set(1);
+            return true;
+        }
+        else if (c == 'n') {
+            // unhide cursor
+            curs_set(1);
+            return false;
+        }
+    }
+}
+
 // remove program from list.txt at curry
 int removeProgram() {
-    // open list.txt
+    char programName[1000];
+
+    // get program name
     FILE *list = fopen(listPath, "r");
-    FILE *temp = fopen(tempPath, "w");
+
     char line[1000];
     int lines = -1;
+    bool isPath = false;
+    while (fgets(line, sizeof(line), list)) {
+        if (lines == ((curry-miny)*2)-1) {
+            strcpy(programName, line);
+            break;
+        }
+        if (isPath) {
+            lines++;
+            isPath = false;
+        }
+        else {
+            isPath = true;
+        }
+    }
+
+    // remove \n from programName
+    programName[strlen(programName) - 1] = '\0';
+
+    if (!confirmRemoveProgram(programName)) {
+        draw();
+        return 0;
+    }
+    // open list.txt
+    
+    FILE *temp = fopen(tempPath, "w");
+    lines = -1;
     int skipCount = 0;
     while (fgets(line, sizeof(line), list)) {
         if (lines == ((curry-miny)*2)-1) {
